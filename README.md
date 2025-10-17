@@ -1,0 +1,535 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Goldbach's Conjecture - Cartoon Math Explorer</title>
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Comic+Neue:wght@700&display=swap');
+
+  /* Background Gradient Animation */
+  body {
+    margin: 0;
+    padding: 40px 20px;
+    min-height: 100vh;
+    font-family: 'Comic Neue', cursive, sans-serif;
+    background: linear-gradient(45deg, #2ecc71, #f1c40f, #3498db);
+    background-size: 600% 600%;
+    animation: backgroundGradient 30s ease infinite;
+    color: #212121;
+    overflow-x: hidden;
+  }
+  @keyframes backgroundGradient {
+    0%{background-position:0% 50%;}
+    50%{background-position:100% 50%;}
+    100%{background-position:0% 50%;}
+  }
+
+  /* Orbiting circles with math symbols */
+  .orbit {
+    position: fixed;
+    border-radius: 50%;
+    border: 2px dashed white;
+    animation-timing-function: linear;
+    pointer-events: none;
+  }
+  #orbit1 {
+    width: 350px;
+    height: 350px;
+    top: 30vh;
+    left: 10vw;
+    animation: spin 25s linear infinite reverse;
+  }
+  #orbit2 {
+    width: 200px;
+    height: 200px;
+    top: 60vh;
+    left: 70vw;
+    animation: spin 18s linear infinite;
+  }
+  #orbit3 {
+    width: 140px;
+    height: 140px;
+    top: 10vh;
+    left: 80vw;
+    animation: spin 15s linear infinite reverse;
+  }
+  #orbit1 span, #orbit2 span, #orbit3 span {
+    position: absolute;
+    font-weight: 900;
+    font-size: 24px;
+    color: white;
+    user-select: none;
+  }
+  #orbit1 span {top: -15px; left: 50%;}
+  #orbit2 span {top: 50%; right: -20px;}
+  #orbit3 span {bottom: -20px; left: 40%;}
+
+  @keyframes spin {
+    from { transform: rotate(0deg);}
+    to { transform: rotate(360deg);}
+  }
+
+  /* Container card */
+  .container {
+    background: white;
+    margin: 0 auto;
+    max-width: 540px;
+    border-radius: 25px;
+    padding: 35px 25px;
+    box-shadow: 0 0 25px rgba(0,0,0,0.3);
+    text-align: center;
+    position: relative;
+  }
+
+  h1 {
+    font-size: 44px;
+    margin-bottom: 8px;
+    color: #34495e;
+    text-shadow: 1px 2px 5px #ecf0f1;
+  }
+  p {
+    color: #7f8c8d;
+    font-size: 20px;
+  }
+
+  input[type="number"] {
+    width: 220px;
+    padding: 14px;
+    font-weight: 700;
+    font-size: 22px;
+    border-radius: 12px;
+    border: 3px solid #2ecc71;
+    text-align: center;
+    margin-top: 20px;
+    transition: border-color 0.3s ease;
+    outline-offset: 3px;
+  }
+  input[type="number"]:focus {
+    outline: none;
+    border-color: #f39c12;
+    box-shadow: 0 0 12px #f39c12;
+  }
+
+  button {
+    margin-top: 25px;
+    background: linear-gradient(135deg, #f39c12, #e67e22, #d35400);
+    border: none;
+    padding: 14px 42px;
+    font-size: 22px;
+    border-radius: 30px;
+    color: white;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 10px 14px #d35400;
+    transition: background 0.4s ease, transform 0.2s ease;
+    user-select: none;
+  }
+
+  button:hover {
+    background: linear-gradient(135deg, #e67e22, #d35400, #f39c12);
+    transform: scale(1.08);
+    box-shadow: 0 12px 18px #f39c12;
+  }
+
+  /* Output area */
+  .output {
+    margin-top: 30px;
+    font-size: 21px;
+    max-height: 300px;
+    overflow-y: auto;
+    color: #2c3e50;
+    text-align: left;
+    padding-left: 15px;
+  }
+  .pair {
+    color: #2980b9;
+    font-weight: 700;
+    font-size: 20px;
+    margin: 8px 0;
+  }
+
+  .count {
+    font-weight: 800;
+    font-size: 22px;
+    margin: 15px 0;
+    color: #d35400;
+  }
+
+  .disprove {
+    margin-top: 28px;
+    font-weight: 900;
+    font-size: 28px;
+    color: #e74c3c;
+    text-shadow: 0 0 7px #c0392b;
+    animation: shake 0.8s ease-in-out infinite alternate;
+    text-align: center;
+  }
+
+  @keyframes shake {
+    0% {transform: translateX(0);}
+    100% {transform: translateX(8px);}
+  }
+
+  /* Animated math formula with tooltip */
+  .math-formula {
+    font-size: 24px;
+    margin-top: 40px;
+    color: #27ae60;
+    font-weight: 700;
+    text-shadow: 0 0 3px #16a085;
+    position: relative;
+    cursor: help;
+    user-select: none;
+  }
+  .math-formula:hover::after {
+    content: attr(data-explanation);
+    position: absolute;
+    bottom: 120%;
+    left: 50%;
+    transform: translateX(-50%);
+    max-width: 320px;
+    background-color: #f39c12;
+    color: white;
+    padding: 10px 14px;
+    border-radius: 15px;
+    font-size: 16px;
+    text-align: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    opacity: 0.95;
+    pointer-events: none;
+    white-space: normal;
+    z-index: 999;
+  }
+
+  /* Animated sparkle effect on formula */
+  .sparkle {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: gold;
+    top: 50%;
+    left: 50%;
+    border-radius: 50%;
+    box-shadow: 0 0 8px 2px gold, 6px 0 10px 3px gold, -6px 0 10px 3px gold;
+    opacity: 0.6;
+    animation: sparkleAnim 2s infinite ease-in-out;
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+  }
+  @keyframes sparkleAnim {
+    0%, 100% {opacity: 0.6; transform: scale(1);}
+    50% {opacity: 1; transform: scale(1.3);}
+  }
+
+  /* Confetti container */
+  .confetti {
+    pointer-events: none;
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    top: 0; left: 0;
+    overflow: visible;
+    z-index: 10000;
+  }
+  .confetti-piece {
+    position: absolute;
+    width: 12px; height: 12px;
+    background-color: #f39c12;
+    opacity: 0.9;
+    border-radius: 3px;
+    animation: confettiFall linear forwards;
+  }
+  @keyframes confettiFall {
+    0% {transform: translateY(0) rotate(0deg); opacity: 1;}
+    100% {transform: translateY(700px) rotate(360deg); opacity: 0;}
+  }
+</style>
+</head>
+<body>
+
+<!-- Orbiting math symbols -->
+<div id="orbit1" class="orbit"><span>π</span></div>
+<div id="orbit2" class="orbit"><span>∑</span></div>
+<div id="orbit3" class="orbit"><span>√</span></div>
+
+<div class="container" role="main" aria-label="Goldbach Conjecture Explorer">
+  <h1>Goldbach's Conjecture</h1>
+  <p>Enter an even number greater than 2 of 6 digits or less</p>
+  <input type="number" id="inputNumber" min="4" step="2" placeholder="Enter even number" aria-label="Input even number" />
+  <br />
+  <button onclick="playSoundAndFindPairs()" aria-label="Find Goldbach pairs button">Find Goldbach Pairs</button>
+
+  <div class="output" id="outputArea" role="region" aria-live="polite" aria-atomic="true" tabindex="0"></div>
+
+  <div class="math-formula" data-explanation="Goldbach Conjecture: Every even number greater than 2 can be expressed as the sum of two primes.">
+    <span>2n = p₁ + p₂  (where p₁, p₂ are prime numbers)</span>
+  </div>
+</div>
+
+<!-- Confetti container -->
+<div id="confetti-container" class="confetti"></div>
+
+<!-- Sound effect -->
+<audio id="bgSound" src="https://actions.google.com/sounds/v1/ambiences/subtle_ambient_background_loop.ogg" preload="auto"></audio>
+
+<script>
+  function isPrime(num) {
+    if (num < 2) return false;
+    for (let i = 2; i <= Math.sqrt(num); i++) {
+      if (num % i === 0) return false;
+    }
+    return true;
+  }
+
+  function createConfetti() {
+    const container = document.getElementById('confetti-container');
+    for(let i=0; i < 50; i++) {
+      const confetti = document.createElement('div');
+      confetti.classList.add('confetti-piece');
+      confetti.style.left = Math.random() * 100 + 'vw';
+      confetti.style.animationDuration = (Math.random() * 3 + 2) + 's';
+      confetti.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 60%)`;
+      container.appendChild(confetti);
+      setTimeout(() => confetti.remove(), 4000);
+    }
+  }
+
+  function findGoldbachPairs() {
+    const n = parseInt(document.getElementById('inputNumber').value);
+    const output = document.getElementById('outputArea');
+    output.innerHTML = '';
+
+    if (!n || n <= 2 || n % 2 !== 0) {
+      output.innerHTML = '<p>Please enter a valid even number greater than 2 of 6 digits or less.</p>';
+      return;
+    }
+
+    let pairsFound = 0;
+    let pairsHTML = '';
+    for (let i = 2; i <= n / 2; i++) {
+      if (isPrime(i) && isPrime(n - i)) {
+        pairsHTML += `<div class="pair">${i} + ${n - i} = ${n}</div>`;
+        pairsFound++;
+      }
+    }
+
+    // Display pairs count
+    output.innerHTML = `<div class="count">Number of Goldbach pairs: ${pairsFound}</div>`;
+
+    if (pairsFound === 0) {
+      output.innerHTML += '<p>No prime pairs found.</p>';
+    } else {
+      output.innerHTML += pairsHTML;
+      output.innerHTML += '<div class="disprove">Oops! You could not disprove the Goldbach\'s Conjecture.</div>';
+      createConfetti();
+    }
+  }
+
+  // Play background sound + find pairs
+  function playSoundAndFindPairs() {
+    const sound = document.getElementById('bgSound');
+    sound.volume = 0.1;
+    sound.play();
+    findGoldbachPairs();
+  }
+</script>
+<!-- Paste this into your existing HTML file, replacing styles and scripts where needed -->
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Luckiest+Guy&display=swap');
+
+  body {
+    margin: 0;
+    font-family: 'Luckiest Guy', cursive;
+    background: linear-gradient(45deg, #ff4e50, #f9d423, #00b09b);
+    background-size: 600% 600%;
+    animation: gradientShift 20s ease infinite;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 20px;
+    overflow-x: hidden;
+  }
+  @keyframes gradientShift {
+    0% {background-position: 0% 50%;}
+    50% {background-position: 100% 50%;}
+    100% {background-position: 0% 50%;}
+  }
+
+  /* Shapes orbiting for cartoon effect */
+  .orbit {
+    position: fixed;
+    border-radius: 50%;
+    border: 3px dashed #fff;
+    opacity: 0.7;
+    animation: spin 30s linear infinite;
+  }
+  #orbit1 { width: 350px; height: 350px; top: 10%; left: 5%; }
+  #orbit2 { width: 250px; height: 250px; top: 60%; left: 70%; animation-duration: 40s; }
+  #orbit3 { width: 150px; height: 150px; top: 15%; left: 80%; animation-duration: 20s; }
+
+  @keyframes spin {
+    0% {transform: rotate(0deg);}
+    100% {transform: rotate(360deg);}
+  }
+
+  /* Main container */
+  .container {
+    background: rgba(255,255,255,0.85);
+    border-radius: 30px;
+    padding: 40px 30px;
+    max-width: 600px;
+    width: 100%;
+    box-shadow: 0 0 40px #333 inset, 0 0 20px #222;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  h1 {
+    font-family: 'Luckiest Guy', cursive;
+    font-size: 50px;
+    color: #d72631;
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 5px #fff;
+    text-align: center;
+  }
+  p {
+    font-size: 20px;
+    color: #555;
+  }
+  input[type="number"] {
+    margin-top: 20px;
+    padding: 15px;
+    font-size: 22px;
+    border-radius: 20px;
+    border: 4px solid #0077be;
+    outline: none;
+    transition: all 0.3s ease;
+  }
+  input[type="number"]:focus {
+    border-color: #ffd700;
+    box-shadow: 0 0 15px #ffd700;
+  }
+  button {
+    margin-top: 30px;
+    padding: 15px 40px;
+    font-size: 22px;
+    font-family: 'Luckiest Guy', cursive;
+    background: linear-gradient(135deg, #ff5722, #ff9800);
+    border: none;
+    border-radius: 25px;
+    color: #fff;
+    cursor: pointer;
+    box-shadow: 0 8px 15px #ccc;
+    transition: all 0.3s ease;
+  }
+  button:hover {
+    background: linear-gradient(135deg, #ff9800, #ff5722);
+    transform: scale(1.05);
+  }
+
+  /* Output area with center alignment preserved */
+  #outputArea {
+    margin-top: 40px;
+    max-height: 300px;
+    width: 90%;
+    overflow-y: auto;
+    text-align: center;
+  }
+  .pair {
+    display: inline-block;
+    margin: 8px;
+    font-size: 20px;
+    font-weight: bold;
+    color: #388e3c;
+    animation: bounce 1s infinite alternate;
+  }
+  @keyframes bounce {
+    0% {transform: translateY(0);}
+    100% {transform: translateY(-10px);}
+  }
+
+  /* Count of pairs */
+  .pair-count {
+    font-size: 22px;
+    margin: 20px 0;
+    font-weight: bold;
+    color: #00695c;
+    text-shadow: 1px 1px 3px #888;
+  }
+
+  /* Disprove message with animation */
+  .disprove {
+    font-size: 28px;
+    font-weight: 900;
+    color: #e53935;
+    margin-top: 25px;
+    animation: shake infinite alternate;
+  }
+  @keyframes shake {
+    0% { transform: translateX(0);}
+    100% {transform: translateX(8px);}
+  }
+
+  /* Tooltip styled explanation for animated formula */
+  .formula {
+    margin-top: 50px;
+    font-size: 24px;
+    color: #fbc02d;
+    cursor: help;
+    position: relative;
+  }
+  .formula:hover::after {
+    content: attr(data-explanation);
+    position: absolute;
+    bottom: 125%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #f57c00;
+    padding: 12px;
+    border-radius: 10px;
+    color: white;
+    font-size: 16px;
+    max-width: 300px;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+  }
+
+  /* Sparkle animation for glow effect */
+  .sparkle {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background: #ffe135;
+    border-radius: 50%;
+    box-shadow: 0 0 10px #ffe135, 0 0 20px #ffe135 inset;
+    opacity: 0.8;
+    animation: glow 1.5s infinite alternate;
+  }
+  @keyframes glow {
+    0% {box-shadow: 0 0 10px #ffe135, 0 0 20px #ffe135 inset; opacity: 0.8;}
+    100% {box-shadow: 0 0 20px #ffe135, 0 0 30px #ffe135 inset; opacity: 1;}
+  }
+
+</style>
+</head>
+<body>
+
+<!-- Orbiting symbols for cartoon theme -->
+<div id="orbit1" class="orbit"><span>π</span></div>
+<div id="orbit2" class="orbit"><span>∑</span></div>
+<div id="orbit3" class="orbit"><span>√</span></div>
+
+
+  
+</script>
+
+</body>
+</html>
+
